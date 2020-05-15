@@ -13,8 +13,7 @@ class List extends React.Component {
                     onDelete={this.props.onDelete}
                     idToFind={this.props.idToFind}
                     cardIDToFind={cardId}
-                >
-                </Card>
+                ></Card>
             )
         });
 

@@ -46,12 +46,7 @@ class App extends React.Component {
   }
 
   handleDeleteCard = (idToFind, cardIDToFind) => {
-    const listToEdit = this.state.STORE.lists.find(list => list.id === idToFind);
-    const idToDelete = listToEdit.cardIds.findIndex(id => id === cardIDToFind);
-    listToEdit.cardIds.splice(idToDelete, 1);
-    const newLists = this.state.STORE.lists.filter(list => list.id !== idToFind)
-    newLists.push(listToEdit);
-    newLists.sort((a, b) => a.id - b.id);
+    const newLists = this.getNewList(idToFind, cardIDToFind);
     this.setState({
       STORE: {
         lists: newLists,
@@ -60,36 +55,44 @@ class App extends React.Component {
     });
   }
 
-  handleAddRandom = (idToFind) => {
-    const newRandomCard = () => {
-      const id = Math.random().toString(36).substring(2, 4)
-        + Math.random().toString(36).substring(2, 4);
-      return {
-        id,
-        title: `Random Card ${id}`,
-        content: 'lorem ipsum',
-      }
-    }
-    const newCard = newRandomCard();
-    const newCardObject = {[newCard.id]: newCard};
+  getNewList = (idToFind, cardIDToFind, newCardID) => {
     const listToEdit = this.state.STORE.lists.find(list => list.id === idToFind);
-    listToEdit.cardIds.push(newCard.id);
+    if (cardIDToFind) {
+      const idToDelete = listToEdit.cardIds.findIndex(id => id === cardIDToFind);
+      listToEdit.cardIds.splice(idToDelete, 1);
+    }
+    if (newCardID) {
+      listToEdit.cardIds.push(newCardID);
+    }
     const newLists = this.state.STORE.lists.filter(list => list.id !== idToFind)
     newLists.push(listToEdit);
-    newLists.sort((a, b) => a.id - b.id); 
+    newLists.sort((a, b) => a.id - b.id);
+    return newLists;
+  }
+
+  newRandomCard = () => {
+    const id = Math.random().toString(36).substring(2, 4)
+      + Math.random().toString(36).substring(2, 4);
+    return {
+      id,
+      title: `Random Card ${id}`,
+      content: 'lorem ipsum',
+    }
+  }
+
+  handleAddRandom = (idToFind) => {
+    const newCard = this.newRandomCard();
+    const newCardObject = {[newCard.id]: newCard};
+    const newLists = this.getNewList(idToFind, null, newCard.id);
     this.setState({
       STORE: {
         lists: newLists,
         allCards: {...this.state.STORE.allCards, ...newCardObject}
       }
     })
-    console.log(this.state.STORE.allCards)
-
-
   }
 
   render() {
-    console.log(this.state.STORE.lists)
     const cardsArray = this.state.STORE.lists.map(list => {
       return (<List
         key={list.id}
